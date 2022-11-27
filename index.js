@@ -7,11 +7,8 @@ export default class Docker {
   static test() {
     const whichOut = spawnSync('which', ['docker']);
     if (whichOut.status === 0) {
-      const versionOut = spawnSync('docker', ['--version']);
-      const versionString = versionOut.stdout.toString();
-      const versionStart = versionString.indexOf('version ') + 8;
-      const versionEnd = versionString.indexOf(',');
-      const version = versionString.substring(versionStart, versionEnd - 1);
+      const versionOut = spawnSync('docker', ['version', '--format', '{{json .}}']);
+      const version = JSON.parse(versionOut.stdout).Client.Version;
       return {
         path: whichOut.stdout.toString().trim(),
         version
@@ -146,4 +143,13 @@ export default class Docker {
     return { ok, output: JSON.parse(output), stdout, stderr };
   }
 
+  async info() {
+    const { ok, output, stdout, stderr } = await this.cmd(['info', '--format', '{{json .}}']);
+    return { ok, output: JSON.parse(output), stdout, stderr };
+  }
+
+  async version() {
+    const { ok, output, stdout, stderr } = await this.cmd(['version', '--format', '{{json .}}']);
+    return { ok, output: JSON.parse(output), stdout, stderr };
+  }
 }

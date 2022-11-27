@@ -32,6 +32,11 @@ async function main() {
   const inspect = await docker.inspect('hello-world');
   if (inspect.ok) console.log(inspect.output);
 
+  const info = await docker.info();
+  if (info.ok) console.log(info.output);
+
+  const version = await docker.version();
+  if (version.ok) console.log(version.output);
 }
 
 main();
