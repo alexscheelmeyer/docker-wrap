@@ -25,7 +25,7 @@ export default class Docker {
     this.echo = options.echo;
   }
 
-  async _cmd(cmdArgs, options = {}) {
+  async cmd(cmdArgs, options = {}) {
     return new Promise((resolve, reject) => {
       const spawnOptions = {
         cwd: options.cwd || undefined
@@ -54,7 +54,7 @@ export default class Docker {
   }
 
   async _tableCmd(cmdArgs, options = {}) {
-    const cmdOut = await this._cmd(cmdArgs, options);
+    const cmdOut = await this.cmd(cmdArgs, options);
     if (!cmdOut.ok) return cmdOut;
 
     let ok = true; // at this point we have succes from running the command
@@ -101,7 +101,7 @@ export default class Docker {
     }
 
     args.push('.'); // we use cwd to specify folder, so from dockers perspective we are always building from current directory
-    const out = await this._cmd(args, { cwd });
+    const out = await this.cmd(args, { cwd });
 
     if (idFile) {
       out.id = fs.readFileSync(idFile).toString();
@@ -132,9 +132,13 @@ export default class Docker {
 
     args.push(image);
 
-    const res = await this._cmd(args);
+    const res = await this.cmd(args);
     if (res.ok) res.id = res.output.trim();
     return res;
+  }
+
+  async kill(containerId) {
+    return this.cmd(['kill', containerId]);
   }
 
 }

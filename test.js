@@ -23,7 +23,10 @@ async function main() {
   if (images.ok) console.log(images.images);
 
   const run = await docker.run({ image: 'githost-integration', options: ['-p', '2222:22', '-p', '3000:3000'] });
-  if (run.ok) console.log(run.id);
+  if (run.ok) {
+    console.log(run.id);
+    await docker.kill(run.id);
+  }
   else console.error(run);
 
 
