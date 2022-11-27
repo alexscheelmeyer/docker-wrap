@@ -53,29 +53,34 @@ export default class Docker {
     });
   }
 
+  async _tableCmd(cmdArgs, options = {}) {
+    const cmdOut = await this._cmd(cmdArgs, options);
+    if (!cmdOut.ok) return cmdOut;
+
+    let ok = true; // at this point we have succes from running the command
+    let rows = [];
+    try {
+      const lines = cmdOut.stdout.split(/\r?\n/);
+      rows = cliTable2Json(lines);
+    } catch(e) {
+      ok = false; // we somehow failed to parse the output
+    }
+    return {
+      ok,
+      output: cmdOut.output,
+      stdout: cmdOut.stdout,
+      stderr: cmdOut.stderr,
+      rows
+    };
+  }
+
   async hello() {
     return this._cmd(['run', 'hello-world']);
   }
 
   async ps(options = [] ) {
-    const psOut = await this._cmd(['ps', '--no-trunc'].concat(options));
-    if (!psOut.ok) return psOut;
-
-    let ok = true; // at this point we have succes from running the command
-    let containers = [];
-    try {
-      const lines = psOut.stdout.split(/\r?\n/);
-      containers = cliTable2Json(lines);
-    } catch(e) {
-      ok = false; // we somehow failed to parse the output
-    }
-    return {
-      ok: true,
-      output: psOut.output,
-      stdout: psOut.stdout,
-      stderr: psOut.stderr,
-      containers
-    };
+    const { ok, output, stdout, stderr, rows } = await this._tableCmd(['ps', '--no-trunc'].concat(options));
+    return { ok, output, stdout, stderr, containers: rows };
   }
 
   async build({ tag = null, cwd = '.', dockerfile = 'Dockerfile', options = [], noId = false }) {
@@ -95,7 +100,7 @@ export default class Docker {
       args.push(idFile);
     }
 
-    args.push('.');
+    args.push('.'); // we use cwd to specify folder, so from dockers perspective we are always building from current directory
     const out = await this._cmd(args, { cwd });
 
     if (idFile) {
@@ -103,6 +108,11 @@ export default class Docker {
     }
 
     return out;
+  }
+
+  async images(options = []) {
+    const { ok, output, stdout, stderr, rows } = await this._tableCmd(['images', '--no-trunc'].concat(options));
+    return { ok, output, stdout, stderr, images: rows };
   }
 
 }
