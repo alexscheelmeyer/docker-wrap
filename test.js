@@ -17,7 +17,7 @@ async function main() {
   if (ps.ok) console.log(ps.containers);
 
   const build = await docker.build({ tag: 'githost-integration', cwd: '../saasless/git/' });
-  if (build.ok) console.log(build.output);
+  if (build.ok) console.log(build.id);
   else console.error(build);
 }
 

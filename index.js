@@ -1,5 +1,7 @@
+import fs from 'fs';
 import { exec, spawn, spawnSync } from "child_process";
 import { cliTable2Json } from "cli-table-2-json";
+import tempfile from 'tempfile';
 
 export default class Docker {
   static test() {
@@ -76,7 +78,7 @@ export default class Docker {
     };
   }
 
-  async build({ tag = null, cwd = '.', dockerfile = 'Dockerfile', options = [] }) {
+  async build({ tag = null, cwd = '.', dockerfile = 'Dockerfile', options = [], noId = false }) {
     const args = ['build'];
     if (tag) {
       args.push('-t');
@@ -86,9 +88,21 @@ export default class Docker {
     args.push('-f');
     args.push(dockerfile);
 
-    args.push('.');
-    return this._cmd(args, { cwd });
-  }
+    let idFile = null;
+    if (!noId) {
+      args.push('--iidfile');
+      idFile = tempfile();
+      args.push(idFile);
+    }
 
+    args.push('.');
+    const out = await this._cmd(args, { cwd });
+
+    if (idFile) {
+      out.id = fs.readFileSync(idFile).toString();
+    }
+
+    return out;
+  }
 
 }
