@@ -141,4 +141,9 @@ export default class Docker {
     return this.cmd(['kill', containerId]);
   }
 
+  async inspect(nameOrId) {
+    const { ok, output, stdout, stderr } = await this.cmd(['inspect', nameOrId]);
+    return { ok, output: JSON.parse(output), stdout, stderr };
+  }
+
 }

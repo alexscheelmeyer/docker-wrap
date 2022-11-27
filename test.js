@@ -29,6 +29,8 @@ async function main() {
   }
   else console.error(run);
 
+  const inspect = await docker.inspect('hello-world');
+  if (inspect.ok) console.log(inspect.output);
 
 }
 
