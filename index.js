@@ -18,14 +18,20 @@ export default class Docker {
     return null;
   }
 
-  constructor(options = { echo: false }) {
+  constructor(options = { echo: false, env: {} }) {
     this.echo = options.echo;
+    this.env = {
+      HOME: process.env.HOME,
+      PATH: process.env.PATH,
+      ...options.env
+    };
   }
 
   async cmd(cmdArgs, options = {}) {
     return new Promise((resolve, reject) => {
       const spawnOptions = {
-        cwd: options.cwd || undefined
+        cwd: options.cwd || undefined,
+        env: this.env
       };
       const command = spawn('docker', cmdArgs, spawnOptions);
       if (options.stdin) {
