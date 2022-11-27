@@ -4,7 +4,7 @@ entities) and tries to provide a simple and usable API for using docker programm
 
 ## Warning
 This does not currently do any input sanitization and forwards your inputs to the shell, so be sure to not
-use user inputs for the arguments without sanitizing the first.
+use user inputs for the arguments without sanitizing them first.
 
 ## Usage
 This package uses es6 import syntax, so be sure to use Node >= V13.
@@ -27,6 +27,9 @@ or with options set:
 const docker = new Docker({ echo: true, env: { HTTPS_PROXY: '<url>' });
 ```
 
+Set the `echo` option to `true` if you want all the docker output to be echoed to stdout. This can be useful
+for debugging or to have an audit-trail.
+
 The default options are to have `echo = false` and the `HOME` and `PATH` environment variables to be mirrored.
 
 
@@ -34,7 +37,7 @@ The default options are to have `echo = false` and the `HOME` and `PATH` environ
 On the instance you have access to a generic `cmd` method. You should normally only use this if you cant use
 one of the pre-wrapped docker commands documented below, but it is useful to know since the commands all use
 this internally and that is reflected in the structure of the response-object. The command invokes the docker
-cli and get the results back as a promise:
+cli and provides back the results as a promise:
 
 ```js
 const ps = await docker.cmd(['ps']);
@@ -107,7 +110,7 @@ if (run.ok) console.log(run.id);
 
 The `id` property is the id of the newly started container.
 
-Note that _this uses different defaults compared to docker cli_, by default it will run the container
+Note that _this uses different defaults compared to docker cli_. By default it will run the container
 "detached" and also _by default the container will be automatically removed when stopped_. To undo
 this you can provide the `detach: false` and `remove: false` options.
 
@@ -133,8 +136,9 @@ by inputting the given password through stdin to make sure it does not end up in
 `logout` command is just provided for symmetry:
 
 ```js
-const login = await docker.login(process.env.USER, process.env.PW);
+const login = await docker.login(username, password);
 if (login.ok) {
+  // Do your thing
   await docker.logout();
 }
 ```
@@ -147,14 +151,12 @@ On the Docker class object you can use the `test` method, it will try to figure 
 const dockerFound = Docker.test();
 if (dockerFound) {
   console.log(`docker found in ${dockerFound.path} with version ${dockerFound.version}`);
-} else {
-  process.exit(-1);
-  return;
 }
 ```
 
 ## Various
 
 Author: Alex Scheel Meyer
+
 License: MIT
 

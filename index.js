@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { exec, spawn, spawnSync } from "child_process";
+import { spawn, spawnSync } from "child_process";
 import { cliTable2Json } from "cli-table-2-json";
 import tempfile from 'tempfile';
 
