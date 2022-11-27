@@ -27,7 +27,6 @@ async function main() {
     console.log(run.id);
     await docker.kill(run.id);
   }
-  else console.error(run);
 
   const inspect = await docker.inspect('hello-world');
   if (inspect.ok) console.log(inspect.output);
@@ -37,6 +36,10 @@ async function main() {
 
   const version = await docker.version();
   if (version.ok) console.log(version.output);
+
+  const search = await docker.search('nginx');
+  if (search.ok) console.log(search.images);
+  else console.error(search);
 }
 
 main();

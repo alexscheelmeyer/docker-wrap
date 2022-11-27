@@ -152,4 +152,11 @@ export default class Docker {
     const { ok, output, stdout, stderr } = await this.cmd(['version', '--format', '{{json .}}']);
     return { ok, output: JSON.parse(output), stdout, stderr };
   }
+
+  async search(term, options = []) {
+    const { ok, output, stdout, stderr, rows } = await this._tableCmd(['search', '--no-trunc', term].concat(options));
+    return { ok, output, stdout, stderr, images: rows };
+  }
+
+
 }
