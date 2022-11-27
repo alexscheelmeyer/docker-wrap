@@ -18,10 +18,14 @@ async function main() {
 
   const build = await docker.build({ tag: 'githost-integration', cwd: '../saasless/git/' });
   if (build.ok) console.log(build.id);
-  else console.error(build);
 
   const images = await docker.images();
-  if (images.ok) console.log(images);
+  if (images.ok) console.log(images.images);
+
+  const run = await docker.run({ image: 'githost-integration', options: ['-p', '2222:22', '-p', '3000:3000'] });
+  if (run.ok) console.log(run.id);
+  else console.error(run);
+
 
 }
 

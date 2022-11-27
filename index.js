@@ -75,7 +75,7 @@ export default class Docker {
   }
 
   async hello() {
-    return this._cmd(['run', 'hello-world']);
+    return this.run({ image: 'hello-world', detach: false });
   }
 
   async ps(options = [] ) {
@@ -113,6 +113,28 @@ export default class Docker {
   async images(options = []) {
     const { ok, output, stdout, stderr, rows } = await this._tableCmd(['images', '--no-trunc'].concat(options));
     return { ok, output, stdout, stderr, images: rows };
+  }
+
+  async run({ image = null, detach = true, remove = true, options = [] }) {
+    if (!image) throw new Error('Docker run needs a tag or id for the image to run');
+
+    let args = ['run'];
+
+    if (detach) {
+      args.push('-d');
+    }
+
+    if (detach) {
+      args.push('--rm');
+    }
+
+    args = args.concat(options);
+
+    args.push(image);
+
+    const res = await this._cmd(args);
+    if (res.ok) res.id = res.output.trim();
+    return res;
   }
 
 }
