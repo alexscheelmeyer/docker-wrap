@@ -40,6 +40,11 @@ async function main() {
   const search = await docker.search('nginx');
   if (search.ok) console.log(search.images);
   else console.error(search);
+
+  const login = await docker.login(process.env.USER, process.env.PW);
+  if (login.ok) {
+    await docker.logout();
+  }
 }
 
 main();

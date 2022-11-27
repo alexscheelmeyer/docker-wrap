@@ -27,16 +27,20 @@ export default class Docker {
       const spawnOptions = {
         cwd: options.cwd || undefined
       };
-      const helloCmd = spawn('docker', cmdArgs, spawnOptions);
+      const command = spawn('docker', cmdArgs, spawnOptions);
+      if (options.stdin) {
+        command.stdin.write(options.stdin);
+        command.stdin.end();
+      }
       const outputChunks = [];
       const stdoutChunks = [];
       const stderrChunks = [];
       const log = (chunk) => {
         if (this.echo) console.log(chunk.toString());
       };
-      helloCmd.stdout.on('data', (chunk) => { log(chunk); stdoutChunks.push(chunk); outputChunks.push(chunk); });
-      helloCmd.stderr.on('data', (chunk) => { log(chunk); stderrChunks.push(chunk); outputChunks.push(chunk); });
-      helloCmd.on('close', (status) => {
+      command.stdout.on('data', (chunk) => { log(chunk); stdoutChunks.push(chunk); outputChunks.push(chunk); });
+      command.stderr.on('data', (chunk) => { log(chunk); stderrChunks.push(chunk); outputChunks.push(chunk); });
+      command.on('close', (status) => {
         const output = outputChunks.join('');
         const stdout = stdoutChunks.join('');
         const stderr = stderrChunks.join('');
@@ -158,5 +162,11 @@ export default class Docker {
     return { ok, output, stdout, stderr, images: rows };
   }
 
+  async login(username, password) {
+    return this.cmd(['login', '--username', username, '--password-stdin'], { stdin: password });
+  }
 
+  async logout() {
+    return this.cmd(['logout']);
+  }
 }
