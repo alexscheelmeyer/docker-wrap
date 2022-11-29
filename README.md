@@ -6,6 +6,8 @@ entities) and tries to provide a simple and usable API for using docker programm
 This does not currently do any input sanitization and forwards your inputs to the shell, so be sure to not
 use user inputs for the arguments without sanitizing them first.
 
+This will not install Docker for you, it is assumed to already be installed.
+
 ## Usage
 This package uses es6 import syntax, so be sure to use Node >= V13.
 
@@ -32,6 +34,8 @@ for debugging or to have an audit-trail.
 
 The default options are to have `echo = false` and the `HOME` and `PATH` environment variables to be mirrored.
 
+You can also import `Container` and `Image` classes if you want to instantiate them yourself, in most cases
+you will simply use them as output from the methods described below.
 
 ### Generic Commands
 On the instance you have access to a generic `cmd` method. You should normally only use this if you cant use
