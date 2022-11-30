@@ -1,6 +1,7 @@
 # docker-wrap
-This wraps the messy parts of the docker cli interface (such as parsing cli tables and getting the ids of created
-entities) and tries to provide a simple and usable API for using docker programmatically.
+This wraps the messy parts of the docker cli interface (such as getting the output in computer-readable
+format and getting the ids of created entities) and tries to provide a simple and usable API for using
+docker programmatically.
 
 ## Warning
 This does not currently do any input sanitization and forwards your inputs to the shell, so be sure to not
@@ -39,7 +40,7 @@ you will simply use them as output from the methods described below.
 
 ## Docker Commands
 
-### `cmd` Command
+### `cmd`
 On the instance you have access to a generic `cmd` method. You should normally only use this if you cant use
 one of the pre-wrapped docker commands documented below, but it is useful to know since the commands all use
 this internally and it can serve as a fallback if needed. The command invokes the docker cli and provides back
@@ -70,7 +71,7 @@ const hello = await docker.hello();
 if (hello) console.log(hello);
 ```
 
-The response is the text output from running the `hello-world` image.
+The response is the text output from running the `hello-world` image or `null` if it failed.
 
 ### `ps` Command
 This wraps `docker ps` to get the currently running containers:
@@ -88,7 +89,7 @@ other properties that might or might not be there:
  - `imageName`: the name of that image
  - `createdAt`: a `Date` with the time of when the container was created
  - `startedAt`: a `Date` with the time of when the container was started
- - `state`: a string description of the container state, typicallu "running" or "exited"
+ - `state`: a string description of the container state, typically "running" or "exited"
 
 ### `images` Command
 This wraps `docker images` and allows you to get the list of images:
@@ -129,10 +130,10 @@ const container = await docker.run({ image: '<my-tag>', options: ['-p', '3000:30
 ```
 
 The response is either an instance of `Container` for the newly created container (if `detach: true`)
-or the text output of running the container (if `detach: false`).
+or the text output (stdout) of running the container (if `detach: false`).
 
 Note that _this uses different defaults compared to docker cli_. By default it will run the container
-"detached" and also _by default the container will be automatically removed when stopped_. To undo
+"detached" and also _by default the container will be automatically removed when stopped_. To avoid
 this you can provide the `detach: false` and `remove: false` options.
 
 
@@ -187,6 +188,9 @@ This is the same as `docker kill <container-id>`:
 ```js
 await container.kill();
 ```
+
+Note that this _will not update the state property of the container_, you should discard the instance and
+create a new one if you need that.
 
 
 ## Various

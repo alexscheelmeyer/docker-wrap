@@ -238,7 +238,7 @@ export default class Docker {
       if (detach) {
         return await this._containerFromId(res.output.trim());
       } else {
-        return res.output;
+        return res.stdout;
       }
     }
     console.log('FAILED', res);
