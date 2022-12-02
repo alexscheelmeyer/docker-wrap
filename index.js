@@ -178,11 +178,8 @@ export default class Docker {
       // other information not found in the regular "docker ps" output
       for (const row of rows) {
         const id = getId(row['ID']);
-        const output = await this.inspect(id);
-        let container;
-        if (output) {
-          container = await this._containerFromId(id);
-        } else {
+        let container = await this._containerFromId(id);
+        if (!container) {
           // inspect failed, just make a container with the basic info
           container = new Container({
             id,
