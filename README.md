@@ -212,11 +212,17 @@ This is the same as `docker kill <container-id>` or `docker stop <container-id>`
 await container.kill();
 ```
 
+or:
+
+```js
+await container.stop();
+```
+
 Note that this _will not update the state property of the container_, you should discard the instance and
 create a new one if you need that.
 
 ### `exec` Method
-This is just a shorthand for `docker.exec('my-up', 'command');` so you dont need to worry about the id:
+This is just a shorthand for `docker.exec('my-id', 'command');` so you dont need to worry about the id:
 
 ```js
 await container.exec('cat /etc/os-release');
