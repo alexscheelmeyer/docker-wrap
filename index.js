@@ -96,7 +96,7 @@ export default class Docker {
   }
 
   async _containerFromId(id) {
-    const output = await this.inspect(id, { noSave: true });
+    const output = await this.inspect(id, { noLog: true });
     if (!output) return null;
 
     const [ info ] = output;
@@ -111,7 +111,7 @@ export default class Docker {
   }
 
   async _imageFromId(id) {
-    const output = await this.inspect(id, { noSave: true });
+    const output = await this.inspect(id, { noLog: true });
     if (!output) return null;
 
     const [ info ] = output;

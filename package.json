@@ -1,6 +1,6 @@
 {
   "name": "docker-wrap",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "Wrapper for the docker cli client",
   "main": "index.js",
   "type": "module",
