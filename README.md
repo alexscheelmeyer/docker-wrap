@@ -167,6 +167,8 @@ the container:
 await docker.exec('my-id', 'cat /etc/os-release');
 ```
 
+The response is the output of running that command or `null` if it failed.
+
 You can also call `exec` on the container instance for the same effect, see below.
 
 ### `inspect`, `info`, `version` Commands
