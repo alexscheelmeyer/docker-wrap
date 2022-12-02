@@ -14,10 +14,10 @@ async function main() {
   if (hello) console.log(hello);
 
   const containers = await docker.ps();
-  if (containers) console.log(containers);
+  if (containers) console.log(containers[0].toString());
 
   const buildImage = await docker.build({ tag: 'githost-integration', cwd: '../saasless/git/' });
-  if (buildImage) console.log(buildImage);
+  if (buildImage) console.log(buildImage.toString());
 
   const images = await docker.images();
   if (images) console.log(images.length);

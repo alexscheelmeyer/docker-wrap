@@ -21,6 +21,12 @@ export class Container {
   async kill() {
     return this._docker.kill(this.id);
   }
+
+  // omit docker from string representation to avoid the noise
+  toString() {
+    const { _docker, ...withoutDocker } = this;
+    return `Container: (${JSON.stringify(withoutDocker)})`;
+  }
 }
 
 
@@ -37,6 +43,12 @@ export class Image {
     this.tags = tags;
     this.size = size;
     this.architecture = architecture;
+  }
+
+  // omit docker from string representation to avoid the noise
+  toString() {
+    const { _docker, ...withoutDocker } = this;
+    return `Image: (${JSON.stringify(withoutDocker)})`;
   }
 }
 
@@ -84,7 +96,7 @@ export default class Docker {
   }
 
   async _containerFromId(id) {
-    const output = await this.inspect(id);
+    const output = await this.inspect(id, { noSave: true });
     if (!output) return null;
 
     const [ info ] = output;
@@ -99,7 +111,7 @@ export default class Docker {
   }
 
   async _imageFromId(id) {
-    const output = await this.inspect(id);
+    const output = await this.inspect(id, { noSave: true });
     if (!output) return null;
 
     const [ info ] = output;
@@ -137,9 +149,11 @@ export default class Docker {
         const stdout = stdoutChunks.join('');
         const stderr = stderrChunks.join('');
 
-        self.lastOutput = output;
-        self.lastStdout = stdout;
-        self.lastStderr = stderr;
+        if (!options.noLog) {
+          self.lastOutput = output;
+          self.lastStdout = stdout;
+          self.lastStderr = stderr;
+        }
 
         resolve({
           ok: status === 0,
@@ -259,8 +273,8 @@ export default class Docker {
     return this.cmd(['kill', containerId]);
   }
 
-  async inspect(nameOrId) {
-    const { ok, output, stdout, stderr } = await this.cmd(['inspect', nameOrId]);
+  async inspect(nameOrId, options={}) {
+    const { ok, output, stdout, stderr } = await this.cmd(['inspect', nameOrId], options);
     if (ok) return JSON.parse(output);
     return null;
   }
