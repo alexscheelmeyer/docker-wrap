@@ -22,6 +22,14 @@ export class Container {
     return this._docker.kill(this.id);
   }
 
+  async stop() {
+    return this._docker.stop(this.id);
+  }
+
+  async exec(command) {
+    return this._docker.exec(this.id, command);
+  }
+
   // omit docker from string representation to avoid the noise
   toString() {
     const { _docker, ...withoutDocker } = this;
@@ -90,6 +98,7 @@ export default class Docker {
       ...options.env
     };
 
+    this.lastCommand = undefined;
     this.lastOutput = undefined;
     this.lastStdout = undefined;
     this.lastStderr = undefined;
@@ -129,9 +138,11 @@ export default class Docker {
     return new Promise((resolve, reject) => {
       const spawnOptions = {
         cwd: options.cwd || undefined,
-        env: this.env
+        env: this.env,
+        shell: true     // for allowing string commands so spaces will work correctly, see: https://stackoverflow.com/questions/57429987/nodejs-spawn-command-with-string-not-array
       };
-      const command = spawn('docker', cmdArgs, spawnOptions);
+      const commandString = ['docker'].concat(cmdArgs).join(' ');
+      const command = spawn(commandString, [], spawnOptions);
       if (options.stdin) {
         command.stdin.write(options.stdin);
         command.stdin.end();
@@ -150,6 +161,7 @@ export default class Docker {
         const stderr = stderrChunks.join('');
 
         if (!options.noLog) {
+          self.lastCommand = commandString;
           self.lastOutput = output;
           self.lastStdout = stdout;
           self.lastStderr = stderr;
@@ -268,6 +280,16 @@ export default class Docker {
 
   async kill(containerId) {
     return this.cmd(['kill', containerId]);
+  }
+
+  async stop(containerId) {
+    return this.cmd(['stop', containerId]);
+  }
+
+  async exec(containerId, command) {
+    const { ok, output, stdout, stderr } = await this.cmd(['exec', containerId].concat(command));
+    if (ok) return output;
+    return null;
   }
 
   async inspect(nameOrId, options={}) {

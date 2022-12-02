@@ -63,8 +63,8 @@ You can also provide a second argument to the `cmd` method, the options argument
  - `stdin`: any data that should be written to stdin of the command
 
 For every command invocation, the outout, stdout and stderr values will also be stored on the instance as
-`lastOutput`, `lastStdout` and `lastStderr` respectively. This allows you to debug the wrapped commands below
-when they fail.
+`lastOutput`, `lastStdout` and `lastStderr` respectively. There is also the `lastCommand` property which
+is the actual command sent to Docker. This allows you to debug the wrapped commands below when they fail.
 
 ### `hello` Command
 This is just a simple wrapper for `docker run hello-world`, that you can use as a sanity-check to know
@@ -150,6 +150,25 @@ await docker.kill('my-id');
 
 You can also call `kill` on the container instance for the same effect, see below.
 
+### `stop` Command
+This wraps `docker stop` and only takes the id of the container to stop:
+
+```js
+await docker.stop('my-id');
+```
+
+You can also call `stop` on the container instance for the same effect, see below.
+
+### `exec` Command
+This wraps `docker exec` and takes the id of the container and the command you want to run inside of
+the container:
+
+```js
+await docker.exec('my-id', 'cat /etc/os-release');
+```
+
+You can also call `exec` on the container instance for the same effect, see below.
+
 ### `inspect`, `info`, `version` Commands
 These are just simply wrapped methods of the respective docker commands, in all cases the response
 is a Javascript object of the returned values.
@@ -186,8 +205,8 @@ if (dockerFound) {
 
 ## Container Methods
 
-### `kill` Method
-This is the same as `docker kill <container-id>`:
+### `kill` and `stop` Methods
+This is the same as `docker kill <container-id>` or `docker stop <container-id>`:
 
 ```js
 await container.kill();
@@ -195,6 +214,13 @@ await container.kill();
 
 Note that this _will not update the state property of the container_, you should discard the instance and
 create a new one if you need that.
+
+### `exec` Method
+This is just a shorthand for `docker.exec('my-up', 'command');` so you dont need to worry about the id:
+
+```js
+await container.exec('cat /etc/os-release');
+```
 
 
 ## Various
