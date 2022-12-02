@@ -77,6 +77,10 @@ export default class Docker {
       PATH: process.env.PATH,
       ...options.env
     };
+
+    this.lastOutput = undefined;
+    this.lastStdout = undefined;
+    this.lastStderr = undefined;
   }
 
   async _containerFromId(id) {
@@ -109,6 +113,7 @@ export default class Docker {
   }
 
   async cmd(cmdArgs, options = {}) {
+    const self = this;
     return new Promise((resolve, reject) => {
       const spawnOptions = {
         cwd: options.cwd || undefined,
@@ -131,6 +136,11 @@ export default class Docker {
         const output = outputChunks.join('');
         const stdout = stdoutChunks.join('');
         const stderr = stderrChunks.join('');
+
+        self.lastOutput = output;
+        self.lastStdout = stdout;
+        self.lastStderr = stderr;
+
         resolve({
           ok: status === 0,
           output,

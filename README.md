@@ -62,6 +62,10 @@ You can also provide a second argument to the `cmd` method, the options argument
  - `cwd`: the folder to be used as current directory for the execution
  - `stdin`: any data that should be written to stdin of the command
 
+For every command invocation, the outout, stdout and stderr values will also be stored on the instance as
+`lastOutput`, `lastStdout` and `lastStderr` respectively. This allows you to debug the wrapped commands below
+when they fail.
+
 ### `hello` Command
 This is just a simple wrapper for `docker run hello-world`, that you can use as a sanity-check to know
 if docker-wrap is working:
